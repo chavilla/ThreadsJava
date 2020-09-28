@@ -4,8 +4,6 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.swing.JOptionPane;
-
 public class DemoBank {
 
 	public static void main(String[] args) {
@@ -26,8 +24,8 @@ public class DemoBank {
 
 class Bank {
 	private final double[] accounts;
-	private Lock myLock=new ReentrantLock();
-	private Condition enoughBalance;
+	//private Lock myLock=new ReentrantLock();
+	//private Condition enoughBalance;
 
 	public Bank() {
 		accounts = new double[100];
@@ -37,21 +35,21 @@ class Bank {
 		}
 		
 		// Establece una condicion para cada hilo
-		enoughBalance=myLock.newCondition();
+		//enoughBalance=myLock.newCondition();
 		
 	}
 
-	public void transfer(int originAccount, int destinyAccount, double amount) throws InterruptedException {
+	public synchronized void transfer(int originAccount, int destinyAccount, double amount) throws InterruptedException {
 		
 		//Bloquea el método para que se pueda ejecutar solo un hilo
-		myLock.lock();
+		//myLock.lock();
 		
-		try {
+		//try {
 			
 			// Pone el hilo a la espera dado el caso la transferencia sea mayor al saldo
 			while (accounts[originAccount] < amount) {
-				enoughBalance.await();
-				
+				//enoughBalance.await();
+				wait();
 			}
 
 			System.out.print(Thread.currentThread() + " "); // Imprime hilo actual
@@ -66,12 +64,15 @@ class Bank {
 			
 			System.out.println();
 			
-			enoughBalance.signalAll(); // Despierta los hilos que están a la espera
+			notifyAll();
+			
+			//enoughBalance.signalAll(); // Despierta los hilos que están a la espera
 			
 			
-		}finally {
-			myLock.unlock();
-		}
+			
+		//}//finally {
+			//myLock.unlock();
+		//}
 		
 		
 
